@@ -29,7 +29,24 @@ App = {
       // Connect provider to interact with contract
       App.contracts.Election.setProvider(App.web3Provider);
 
+      App.listenForEvents();
+
       return App.render();
+    });
+  },
+
+  // listen for events emitted from the contract
+  listenForEvents: function() {
+    App.contracts.Election.deployed().then(function(instance) {
+      // Restart chrome if you are unable to receive this event
+      // this is a known issue with Metamask
+      // https://github.com/MetaMask/metamask-extension/issues/2393
+      instance.votedEvent({/* possible filter that i am not making use of here */}, {
+        toBlock: 'latest'
+      }).watch(function(error, event) {
+        // Reload when a new vote is recorded
+        App.render();
+      });
     });
   },
 
